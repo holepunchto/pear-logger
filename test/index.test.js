@@ -5,6 +5,7 @@ const Logger = require('..')
 
 const consoleLog = console.log
 const consoleError = console.error
+const consoleTrace = console.trace
 
 test('logger level OFF', async function (t) {
   t.plan(2)
@@ -221,11 +222,13 @@ test('Logger constructor with custom switches', async function (t) {
 
   const Logger = require('..')
 
+  const originalSwitches = { ...Logger.switches }
   Logger.switches = {
     ...Logger.switches,
     level: Logger.ERR,
     labels: ['label-test']
   }
+  t.teardown(() => { Logger.switches = originalSwitches })
 
   let consoleLogCount = 0
   console.log = () => { consoleLogCount += 1 }
@@ -266,4 +269,40 @@ test('logger format stacks: true', async function (t) {
   t.ok(/(\n^ {4}at .+$)+/m.test(logger.format('ERR', 'label-test', 'error')))
   t.ok(/(\n^ {4}at .+$)+/m.test(logger.format('ERR', 'label-test', 'error')))
   t.is(logger.format('TRC', 'label-test', 'trace'), '')
+})
+
+test('logger with array labels', async function (t) {
+  t.plan(9)
+
+  const Logger = require('..')
+
+  let logOutput = ''
+  console.log = (...args) => { logOutput +=  args.join(' ') + '\n' }
+  t.teardown(() => { console.log = consoleLog })
+
+  let errorOutput = ''
+  console.error = (...args) => { errorOutput +=  args.join(' ') + '\n' }
+  t.teardown(() => { console.error = consoleError })
+
+  const logger = new Logger({ labels: ['label1', 'label2'], level: Logger.TRC })
+  try {
+    logger.error(['label1', 'label2', 'label3'], 'error')
+    logger.info(['label1', 'label2', 'label3'], 'info')
+    logger.trace(['label1', 'label2', 'label3'], 'trace')
+  } finally {
+    console.log = consoleLog
+    console.error = consoleError
+  }
+
+  t.ok(logOutput.includes('INF [ label1 ] info'), 'should include info message for label1')
+  t.ok(logOutput.includes('INF [ label2 ] info'), 'should include info message for label2')
+  t.ok(!logOutput.includes('INF [ label3 ] info'), 'should not include info message for label3')
+
+  t.ok(errorOutput.includes('ERR [ label1 ] error'), 'should include error message for label1')
+  t.ok(errorOutput.includes('ERR [ label2 ] error'), 'should include error message for label2')
+  t.ok(!errorOutput.includes('ERR [ label3 ] error'), 'should not include error message for label3')
+
+  t.ok(errorOutput.includes('TRC [ label1 ] trace'), 'should include trace message for label1')
+  t.ok(errorOutput.includes('TRC [ label2 ] trace'), 'should include trace message for label2')
+  t.ok(!errorOutput.includes('TRC [ label3 ] trace'), 'should not include trace message for label3')
 })
