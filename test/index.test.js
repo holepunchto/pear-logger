@@ -320,3 +320,25 @@ test('logger format with array labels', async function (t) {
   t.ok(lines[0].startsWith('ERR [ label1 ] error'), 'should format first label correctly')
   t.ok(lines[1].startsWith('ERR [ label2 ] error'), 'should format first label correctly')
 })
+
+test('logger should show/hide fields', async function (t) {
+  t.plan(4)
+
+  const Logger = require('..')
+
+  const output1 = new Logger({ labels: ['label1'], level: Logger.INF, fields: ['time'] })
+    .format('INF', 'label1', 'info')
+  t.is(/^INF [\d:.]+ \[ label1 ] info \[[\d.+]+ms]$/.test(output1.trim()), true, 'should show time field')
+
+  const output2 = new Logger({ labels: ['label1'], level: Logger.INF, fields: ['h:delta'] })
+    .format('INF', 'label1', 'info')
+  t.is(output2.trim(), 'INF [ label1 ] info', 'should hide delta field')
+
+  const output3 = new Logger({ labels: ['label1'], level: Logger.INF, fields: ['time,h:delta'] })
+    .format('INF', 'label1', 'info')
+  t.is(/^INF [\d:.]+ \[ label1 ] info$/.test(output3.trim()), true, 'should support multiple fields')
+
+  const output4 = new Logger({ labels: ['label1'], level: Logger.INF, fields: ['delta,h:delta'] })
+    .format('INF', 'label1', 'info')
+  t.is(output4.trim(), 'INF [ label1 ] info', 'should override with hide')
+})
