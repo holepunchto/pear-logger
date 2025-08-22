@@ -123,7 +123,7 @@ class Logger {
     if (typeof level === 'number') level = this.constructor[level]
     if (this.LEVEL < this.constructor[level]) return ''
     if (Array.isArray(label)) {
-      return label.map((lbl) => this.format(level, lbl, ...args).join('\n'))
+      return label.map((lbl) => this.format(level, lbl, ...args)).join('\n')
     }
     if (!this._labels.has(label)) return ''
     Error.captureStackTrace(this, this.format)
