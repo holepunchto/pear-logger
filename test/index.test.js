@@ -307,7 +307,7 @@ test('logger with array labels', async function (t) {
   t.ok(!errorOutput.includes('TRC [ label3 ] trace'), 'should not include trace message for label3')
 })
 
-test.solo('logger format with array labels', async function (t) {
+test('logger format with array labels', async function (t) {
   t.plan(3)
 
   const Logger = require('..')
