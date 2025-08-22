@@ -342,3 +342,31 @@ test('logger should show/hide fields', async function (t) {
     .format('INF', 'label1', 'info')
   t.is(output4.trim(), 'INF [ label1 ] info', 'should override with hide')
 })
+
+test('logger should print stack trace', async function (t) {
+  t.plan(4)
+
+  let logOutput = ''
+  console.log = (...args) => { logOutput +=  args.join(' ') + '\n' }
+  t.teardown(() => { console.log = consoleLog })
+
+  let errorOutput = ''
+  console.error = (...args) => { errorOutput +=  args.join(' ') + '\n' }
+  t.teardown(() => { console.error = consoleError })
+
+  const Logger = require('..')
+  const logger = new Logger({ labels: ['label1'], level: Logger.TRC, stacks: true })
+
+  logger.trace('label1', 'trace')
+  t.ok(/\s+at\s+/.test(errorOutput), 'should include stack trace in trace output')
+
+  logger.info('label1', 'info')
+  t.ok(/\s+at\s+/.test(logOutput), 'should include stack trace in info output')
+
+  errorOutput = ''
+  logger.error('label1', 'error')
+  t.ok(/\s+at\s+/.test(errorOutput), 'should include stack trace in error output')
+
+  const formatOutput = logger.format('ERR', 'label1', 'error')
+  t.ok(/\s+at\s+/.test(formatOutput), 'should include stack trace in format output')
+})
