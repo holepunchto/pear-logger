@@ -5,7 +5,6 @@ const Logger = require('..')
 
 const consoleLog = console.log
 const consoleError = console.error
-const consoleTrace = console.trace
 
 test('logger level OFF', async function (t) {
   t.plan(2)
@@ -277,11 +276,11 @@ test('logger with array labels', async function (t) {
   const Logger = require('..')
 
   let logOutput = ''
-  console.log = (...args) => { logOutput +=  args.join(' ') + '\n' }
+  console.log = (...args) => { logOutput += args.join(' ') + '\n' }
   t.teardown(() => { console.log = consoleLog })
 
   let errorOutput = ''
-  console.error = (...args) => { errorOutput +=  args.join(' ') + '\n' }
+  console.error = (...args) => { errorOutput += args.join(' ') + '\n' }
   t.teardown(() => { console.error = consoleError })
 
   const logger = new Logger({ labels: ['label1', 'label2'], level: Logger.TRC })
@@ -347,11 +346,11 @@ test('logger should print stack trace', async function (t) {
   t.plan(4)
 
   let logOutput = ''
-  console.log = (...args) => { logOutput +=  args.join(' ') + '\n' }
+  console.log = (...args) => { logOutput += args.join(' ') + '\n' }
   t.teardown(() => { console.log = consoleLog })
 
   let errorOutput = ''
-  console.error = (...args) => { errorOutput +=  args.join(' ') + '\n' }
+  console.error = (...args) => { errorOutput += args.join(' ') + '\n' }
   t.teardown(() => { console.error = consoleError })
 
   const Logger = require('..')
