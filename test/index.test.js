@@ -370,3 +370,17 @@ test('logger should print stack trace', async function (t) {
   const formatOutput = logger.format('ERR', 'label1', 'error')
   t.ok(/\s+at\s+/.test(formatOutput), 'should include stack trace in format output')
 })
+
+test('logger should accept string parse level', async function (t) {
+  t.plan(4)
+
+  const Logger = require('..')
+
+  const logger1 = new Logger({ labels: ['label1'], level: 'ERR' })
+  t.ok(logger1.format('ERR', 'label1', 'error').startsWith('ERR [ label1 ] error'), 'should format error message correctly')
+  t.is(logger1.format('INF', 'label1', 'info').trim(), '', 'should not format info message at ERR level')
+
+  const logger2 = new Logger({ labels: ['label1'], level: 'inf' })
+  t.ok(logger2.format('ERR', 'label1', 'error').startsWith('ERR [ label1 ] error'), 'should format error message correctly')
+  t.ok(logger2.format('INF', 'label1', 'info').startsWith('INF [ label1 ] info'), 'should format error message correctly')
+})
