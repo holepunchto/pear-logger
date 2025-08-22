@@ -306,3 +306,17 @@ test('logger with array labels', async function (t) {
   t.ok(errorOutput.includes('TRC [ label2 ] trace'), 'should include trace message for label2')
   t.ok(!errorOutput.includes('TRC [ label3 ] trace'), 'should not include trace message for label3')
 })
+
+test.solo('logger format with array labels', async function (t) {
+  t.plan(3)
+
+  const Logger = require('..')
+  const logger = new Logger({ labels: ['label1', 'label2'], level: Logger.INF })
+
+  const output = logger.format('ERR', ['label1', 'label2', 'label3'], 'error')
+  const lines = output.split('\n').filter(line => line.trim() !== '')
+
+  t.ok(lines.length === 2, 'should have two lines in output')
+  t.ok(lines[0].startsWith('ERR [ label1 ] error'), 'should format first label correctly')
+  t.ok(lines[1].startsWith('ERR [ label2 ] error'), 'should format first label correctly')
+})
