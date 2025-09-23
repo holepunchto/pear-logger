@@ -16,12 +16,12 @@ const Logger = require('pear-logger')
 
 **Options:**
 
-* `labels` `string` comma-separated label allowlist
-* `fields` `string` comma-separated: `date,time,level,label,delta`  
+- `labels` `string` comma-separated label allowlist
+- `fields` `string` comma-separated: `date,time,level,label,delta`  
   Prefix with `h:` to hide (e.g. `h:label`)
-* `stacks` `boolean` include stack traces
-* `level` `number|string` one of `0..3 | 'OFF'|'ERR'|'INF'|'TRC'|'ERROR'|'INFO'|'TRACE'`
-* `pretty` `boolean` hint to hide redundant fields in non-verbose, non-max
+- `stacks` `boolean` include stack traces
+- `level` `number|string` one of `0..3 | 'OFF'|'ERR'|'INF'|'TRC'|'ERROR'|'INFO'|'TRACE'`
+- `pretty` `boolean` hint to hide redundant fields in non-verbose, non-max
 
 ### `logger.OFF` `boolean`
 
@@ -51,20 +51,21 @@ Logs when `level >= INF` and `label` is allowed
 
 Logs when `level >= TRC` and `label` is allowed
 
-### `logger.format(level, label, ...args) -> string | ''`  
+### `logger.format(level, label, ...args) -> string | ''`
 
 Returns a formatted string; respects thresholds, labels, fields, stacks, and TTY color support.
 
-### `Logger.switches`  
+### `Logger.switches`
 
 Defaults from `pear` top-level flags:
-  * `--log` - `log`
-  * `--log-level` - `logLevel`
-  * `--log-labels` - `logLabels`
-  * `--log-fields` - `logFields`
-  * `--log-stacks` - `logStacks`
-  * `--log-verbose` - `logVerbose`
-  * `--log-max` - `logMax`
+
+- `--log` - `log`
+- `--log-level` - `logLevel`
+- `--log-labels` - `logLabels`
+- `--log-fields` - `logFields`
+- `--log-stacks` - `logStacks`
+- `--log-verbose` - `logVerbose`
+- `--log-max` - `logMax`
 
 See `pear -h` for flag descriptions.
 
