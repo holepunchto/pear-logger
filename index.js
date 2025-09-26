@@ -2,15 +2,19 @@
 const { isBare } = require('which-runtime')
 const { formatWithOptions } = isBare ? require('bare-format') : require('util')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
-const pear = require('pear-cmd')(isBare ? global.Bare.argv.slice(1) : process.argv.slice(1))
+const pear = require('pear-cmd')(
+  isBare ? global.Bare.argv.slice(1) : process.argv.slice(1)
+)
 const max = pear?.flags.logMax ?? false
 const verbose = pear?.flags.logVerbose || max
 const log = pear?.flags.log || !!pear?.flags.logLabels || verbose || max
 const switches = {
   log,
-  level: pear?.flags.logLevel ?? (max ? 3 : (log ? 2 : 1)),
+  level: pear?.flags.logLevel ?? (max ? 3 : log ? 2 : 1),
   labels: pear?.flags.logLabels ?? '',
-  fields: verbose ? 'date,time,level,label,delta' : (pear?.flags.logFields ?? ''),
+  fields: verbose
+    ? 'date,time,level,label,delta'
+    : (pear?.flags.logFields ?? ''),
   stacks: pear?.flags.logStacks ?? false,
   verbose,
   max
@@ -27,7 +31,7 @@ class Logger {
   static [2] = 'INF'
   static [3] = 'TRC'
   name = '' // for stacks
-  constructor ({ labels = '', fields, stacks, level, pretty } = {}) {
+  constructor({ labels = '', fields, stacks, level, pretty } = {}) {
     this._fields = this._parseFields(fields + this.constructor.switches.fields)
     labels = this._parseLabels(labels)
       .concat(this._parseLabels(this.constructor.switches.labels))
@@ -40,33 +44,51 @@ class Logger {
     this._times = {}
     if (this._verbose === false && this._max === false && pretty) {
       if (this._fields.seen.has('level') === false) this._show.level = false
-      if (this._fields.seen.has('label') === false) this._show.label = this._labels.size > 2
+      if (this._fields.seen.has('label') === false)
+        this._show.label = this._labels.size > 2
     }
     this.stack = ''
     this.LEVEL = this._parseLevel(level ?? this.constructor.switches.level)
     this._tty = null
   }
 
-  get OFF () { return this.LEVEL === this.constructor.OFF }
-  get ERR () { return this.LEVEL >= this.constructor.ERR }
-  get INF () { return this.LEVEL >= this.constructor.INF }
-  get TRC () { return this.LEVEL >= this.constructor.TRC }
+  get OFF() {
+    return this.LEVEL === this.constructor.OFF
+  }
+  get ERR() {
+    return this.LEVEL >= this.constructor.ERR
+  }
+  get INF() {
+    return this.LEVEL >= this.constructor.INF
+  }
+  get TRC() {
+    return this.LEVEL >= this.constructor.TRC
+  }
 
-  _args (level, label, ...args) {
+  _args(level, label, ...args) {
     const now = hrtime.bigint()
     const ms = Number(now) / 1e6
     const delta = this._times[label] ? ms - Number(this._times[label]) / 1e6 : 0
     this._times[label] = now
-    const datetime = (this._show.date || this._show.time) ? new Date().toISOString().split('T') : []
+    const datetime =
+      this._show.date || this._show.time
+        ? new Date().toISOString().split('T')
+        : []
     const date = this._show.date ? datetime[0] : ''
     const time = this._show.time ? datetime[1].slice(0, -1) : ''
     label = this._show.label ? '[ ' + label.slice(0, 21) + ' ]' : ''
     level = this._show.level ? level : ''
     const prefix = [level, date, time, label].filter(Boolean)
-    return [...prefix, ...args, this._show.delta ? '[+' + (Math.round(delta * Math.pow(10, 4)) / Math.pow(10, 4)) + 'ms]' : '']
+    return [
+      ...prefix,
+      ...args,
+      this._show.delta
+        ? '[+' + Math.round(delta * Math.pow(10, 4)) / Math.pow(10, 4) + 'ms]'
+        : ''
+    ]
   }
 
-  error (label, ...args) {
+  error(label, ...args) {
     if (this.LEVEL < this.constructor.ERR) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.error(lbl, ...args)
@@ -83,7 +105,7 @@ class Logger {
     }
   }
 
-  info (label, ...args) {
+  info(label, ...args) {
     if (this.LEVEL < this.constructor.INF) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.info(lbl, ...args)
@@ -100,7 +122,7 @@ class Logger {
     }
   }
 
-  trace (label, ...args) {
+  trace(label, ...args) {
     if (this.LEVEL < this.constructor.TRC) return
     if (Array.isArray(label)) {
       for (const lbl of label) this.trace(lbl, ...args)
@@ -117,8 +139,11 @@ class Logger {
     }
   }
 
-  format (level, label, ...args) {
-    if (this._tty === null) this._tty = isBare ? require('bare-tty').isTTY(0) : require('tty').isatty(0) // lazy
+  format(level, label, ...args) {
+    if (this._tty === null)
+      this._tty = isBare
+        ? require('bare-tty').isTTY(0)
+        : require('tty').isatty(0) // lazy
     if (Object.hasOwn(this.constructor, level) === false) return ''
     if (typeof level === 'number') level = this.constructor[level]
     if (this.LEVEL < this.constructor[level]) return ''
@@ -129,34 +154,53 @@ class Logger {
     Error.captureStackTrace(this, this.format)
     args = this._args(level, label, ...args)
     if (this._stacks) {
-      const output = formatWithOptions({ colors: this._tty }, ...args, this.stack).replace(/\u0000/g, '') // eslint-disable-line no-control-regex
+      const output = formatWithOptions(
+        { colors: this._tty },
+        ...args,
+        this.stack
+      ).replace(/\u0000/g, '') // eslint-disable-line no-control-regex
       this.stack = ''
       return output
     } else {
-      return formatWithOptions({ colors: this._tty }, ...args).replace(/\u0000/g, '') // eslint-disable-line no-control-regex
+      return formatWithOptions({ colors: this._tty }, ...args).replace(
+        /\u0000/g,
+        ''
+      ) // eslint-disable-line no-control-regex
     }
   }
 
-  _parseLevel (level) {
+  _parseLevel(level) {
     if (typeof level === 'number') return level
     if (typeof level === 'string') level = level.toUpperCase()
     switch (true) {
-      case (level === 'OFF'): return this.constructor.OFF
-      case (level === 'ERR'): return this.constructor.ERR
-      case (level === 'INF'): return this.constructor.INF
-      case (level === 'TRC'): return this.constructor.TRC
-      case (level === '0'): return this.constructor.OFF
-      case (level === '1'): return this.constructor.ERR
-      case (level === '2'): return this.constructor.INF
-      case (level === '3'): return this.constructor.TRC
-      case (level === 'ERROR'): return this.constructor.ERR
-      case (level === 'INFO'): return this.constructor.INF
-      case (level === 'TRACE'): return this.constructor.TRC
-      default: return this.constructor.INF
+      case level === 'OFF':
+        return this.constructor.OFF
+      case level === 'ERR':
+        return this.constructor.ERR
+      case level === 'INF':
+        return this.constructor.INF
+      case level === 'TRC':
+        return this.constructor.TRC
+      case level === '0':
+        return this.constructor.OFF
+      case level === '1':
+        return this.constructor.ERR
+      case level === '2':
+        return this.constructor.INF
+      case level === '3':
+        return this.constructor.TRC
+      case level === 'ERROR':
+        return this.constructor.ERR
+      case level === 'INFO':
+        return this.constructor.INF
+      case level === 'TRACE':
+        return this.constructor.TRC
+      default:
+        return this.constructor.INF
     }
   }
 
-  _parseFields (fields = '') {
+  _parseFields(fields = '') {
     const show = {
       date: false,
       time: false,
@@ -165,7 +209,9 @@ class Logger {
       delta: true
     }
     const seen = new Set()
-    for (let field of fields.split(',').concat(this.constructor.switches.fields.split(','))) {
+    for (let field of fields
+      .split(',')
+      .concat(this.constructor.switches.fields.split(','))) {
       if (seen.has(field)) continue
       field = field.trim()
       if (field.startsWith('h:')) {
@@ -180,7 +226,7 @@ class Logger {
     return { seen, show }
   }
 
-  _parseLabels (labels) {
+  _parseLabels(labels) {
     if (typeof labels !== 'string') return labels
     return labels.split(',')
   }
