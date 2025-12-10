@@ -44,8 +44,9 @@ class Logger {
     this._times = {}
     if (this._verbose === false && this._max === false && pretty) {
       if (this._fields.seen.has('level') === false) this._show.level = false
-      if (this._fields.seen.has('label') === false)
+      if (this._fields.seen.has('label') === false) {
         this._show.label = this._labels.size > 2
+      }
     }
     this.stack = ''
     this.LEVEL = this._parseLevel(level ?? this.constructor.switches.level)
@@ -140,10 +141,11 @@ class Logger {
   }
 
   format(level, label, ...args) {
-    if (this._tty === null)
+    if (this._tty === null) {
       this._tty = isBare
         ? require('bare-tty').isTTY(0)
-        : require('tty').isatty(0) // lazy
+        : require('tty').isatty(0)
+    } // lazy
     if (Object.hasOwn(this.constructor, level) === false) return ''
     if (typeof level === 'number') level = this.constructor[level]
     if (this.LEVEL < this.constructor[level]) return ''
