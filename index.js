@@ -1,6 +1,6 @@
 'use strict'
 const { isBare } = require('which-runtime')
-const { formatWithOptions } = isBare ? require('bare-format') : require('util')
+const { formatWithOptions } = require('util')
 const hrtime = isBare ? require('bare-hrtime') : process.hrtime
 const pear = require('pear-cmd')(
   isBare ? global.Bare.argv.slice(1) : process.argv.slice(1)

@@ -6,8 +6,13 @@
   "description": "Pear logger",
   "license": "Apache-2.0",
   "files": [],
+  "imports": {
+    "util": {
+      "bare": "bare-format"
+    }
+  },
   "scripts": {
-    "format": "prettier --write .",
+    "format": "prettier --write . && lunte --fix",
     "lint": "prettier --check . && lunte",
     "test:gen": "brittle -r test/all.js test/*.test.js",
     "test": "npm run test:node && npm run test:bare",
@@ -16,7 +21,7 @@
   },
   "devDependencies": {
     "brittle": "^3.0.0",
-    "lunte": "^1.3.0",
+    "lunte": "^1.6.0",
     "prettier": "^3.6.2",
     "prettier-config-holepunch": "^1.0.0"
   },
