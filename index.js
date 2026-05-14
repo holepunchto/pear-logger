@@ -1,10 +1,7 @@
 'use strict'
-const { isBare } = require('which-runtime')
-const { formatWithOptions } = require('util')
-const hrtime = isBare ? require('bare-hrtime') : process.hrtime
-const pear = require('pear-cmd')(
-  isBare ? global.Bare.argv.slice(1) : process.argv.slice(1)
-)
+const { formatWithOptions } = require('bare-format')
+const hrtime = require('bare-hrtime')
+const pear = require('pear-cmd')(global.Bare.argv.slice(1))
 const max = pear?.flags.logMax ?? false
 const verbose = pear?.flags.logVerbose || max
 const log = pear?.flags.log || !!pear?.flags.logLabels || verbose || max
@@ -142,9 +139,7 @@ class Logger {
 
   format(level, label, ...args) {
     if (this._tty === null) {
-      this._tty = isBare
-        ? require('bare-tty').isTTY(0)
-        : require('tty').isatty(0)
+      this._tty = require('bare-tty').isTTY(0)
     } // lazy
     if (Object.hasOwn(this.constructor, level) === false) return ''
     if (typeof level === 'number') level = this.constructor[level]
