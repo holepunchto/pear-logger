@@ -1,5 +1,5 @@
 'use strict'
-const { formatWithOptions } = require('bare-util')
+const { formatWithOptions } = require('bare-format')
 const hrtime = require('bare-hrtime')
 const pear = require('pear-cmd')(global.Bare.argv.slice(1))
 const max = pear?.flags.logMax ?? false

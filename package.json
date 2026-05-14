@@ -19,7 +19,7 @@
     "prettier-config-holepunch": "^1.0.0"
   },
   "dependencies": {
-    "bare-format": "^1.0.1",
+    "bare-format": "^1.0.2",
     "bare-hrtime": "^2.0.11",
     "bare-tty": "^5.1.0",
     "pear-cmd": "^1.0.0"
