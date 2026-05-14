@@ -6,11 +6,6 @@
   "description": "Pear logger",
   "license": "Apache-2.0",
   "files": [],
-  "imports": {
-    "util": {
-      "bare": "bare-format"
-    }
-  },
   "scripts": {
     "format": "prettier --write . && lunte --fix",
     "lint": "prettier --check . && lunte",
